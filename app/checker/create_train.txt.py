@@ -13,7 +13,7 @@ folder_path = 'fart/'
 file_names = read_file_names_in_folder(folder_path)
 print(len(file_names))
 
-output_file_path = 'train.txt'
+output_file_path = 'app/model/data/train.txt'
 with open(output_file_path, 'w') as output_file:
     for filename in file_names:
         name = filename.split("_")[1]
