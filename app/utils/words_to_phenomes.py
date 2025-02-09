@@ -11,7 +11,7 @@ phonemes = []
 def words_to_phonemes(words):
     def process_words(sublist, index):
         for word in sublist:
-            phoneme = phonemize(word, language="en-gb", backend="espeak", separator=Separator(phone='.'))
+            phoneme = phonemize(word, language="en-gb", backend="espeak", separator=Separator(phone='.'), strip=True, preserve_punctuation=True)
             phonemes.append(phoneme)
             print(f"Thread {index}: {phoneme}")
 
