@@ -38,12 +38,14 @@ class SimpleAudioGenerator(nn.Module):
 class AudioWave():
     def __init__(self):
         # Load Model
-        model_path = "public/final_audio_generator.pth"
+        self.model_path = "fart_models/final_audiowave_model.pth"
         self.model = SimpleAudioGenerator()
-        self.model.load_state_dict(torch.load(model_path))
-        self.model.eval()
+        
 
     def generate_audio(self, text, output_file="new.wav", sr=22050, max_audio_len=22050):
+        self.model.load_state_dict(torch.load(self.model_path))
+        self.model.eval()
+
         inputs = tokenizer(text, return_tensors='pt', padding='max_length', max_length=50, truncation=True)
         with torch.no_grad():
             text_embedding = text_encoder(**inputs).last_hidden_state.mean(dim=1)  # [1, 768]
@@ -93,6 +95,6 @@ class AudioWave():
             print(f"Epoch {epoch + 1}/{epochs}, Loss: {avg_loss:.6f}")
             
             if (epoch + 1) % 5 == 0:
-                torch.save(model.state_dict(), f"fart_epoch/audio_generator_epoch_{epoch + 1}.pth")
+                torch.save(model.state_dict(), f"fart_models/epochs/audio_generator_epoch_{epoch + 1}.pth")
         
-        torch.save(model.state_dict(), "public/final_audio_generator.pth")
+        torch.save(model.state_dict(), "fart_models/final_audiowave_model.pth")
