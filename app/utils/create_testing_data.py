@@ -1,15 +1,38 @@
 from pydub import AudioSegment
+import threading
+from threading import Semaphore
 
-# Load individual phoneme sounds
-sound1 = AudioSegment.from_wav("fart/fart_h.wav")
-sound2 = AudioSegment.from_wav("fart/fart_ə.wav")
-sound3 = AudioSegment.from_wav("fart/fart_l.wav")
-sound4 = AudioSegment.from_wav("fart/fart_ə.wav")
+def process_phoneme(phoneme, semaphore):
+    try:
+        sounds = []
+        print(phoneme)
+        for p in phoneme.strip().split("."):
+            if p == "":
+                continue
+            print(p)
+            sound = AudioSegment.from_wav(f"fart/fart_{p}.wav")
+            sounds.append(sound)
+        combined = sum(sounds)
+        combined.export(f"fart_test/{phoneme}.wav", format="wav")
+        print(f"Created {phoneme}.wav successfully!")
+    finally:
+        semaphore.release()
 
-# Concatenate them
-combined = sound1 + sound2 + sound3 + sound4
+# Read phoneme file paths from a text file
+with open("public/phonemes.txt", "r") as file:
+    phonemes = [line.strip() for line in file.readlines()]
 
-# Save as a new file
-combined.export("helə.wav", format="wav")
+    # Create a semaphore to limit the number of concurrent threads
+    semaphore = Semaphore(1)
 
-print("Created æk.wav successfully!")
+    # Create and start threads for each phoneme
+    threads = []
+    for phoneme in phonemes[:3]:
+        semaphore.acquire()
+        thread = threading.Thread(target=process_phoneme, args=(phoneme, semaphore))
+        threads.append(thread)
+        thread.start()
+
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
