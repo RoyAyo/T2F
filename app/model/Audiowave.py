@@ -4,9 +4,7 @@ import torch.optim as optim
 import soundfile as sf
 from transformers import BertTokenizer, BertModel
 from app.data_processing.text_to_audio import TextAudioDataset
-import soundfile as sf
 from torch.utils.data import DataLoader
-from transformers import BertTokenizer, BertModel
 
 # Load Tokenizer & Encoder
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -35,13 +33,11 @@ class SimpleAudioGenerator(nn.Module):
         audio = self.decoder(hidden)
         return audio
 
-class AudioWave():
+class AudioWave:
     def __init__(self):
-        # Load Model
         self.model_path = "fart_models/final_audiowave_model.pth"
         self.model = SimpleAudioGenerator()
         
-
     def generate_audio(self, text, output_file="new.wav", sr=22050, max_audio_len=22050):
         self.model.load_state_dict(torch.load(self.model_path))
         self.model.eval()
@@ -59,10 +55,8 @@ class AudioWave():
         return output_file
     
     def train(self, audio_dir="fart_sounds"):
-        audio_dir = "fart_sound_mono"
         dataset = TextAudioDataset(audio_dir)
         dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
-        model = SimpleAudioGenerator()
         self.train_model(self.model, dataloader)
     
     def train_model(self, model, dataloader, epochs=50, lr=0.0005, grad_accum_steps=4):

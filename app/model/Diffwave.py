@@ -1,13 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import soundfile as sf
 from transformers import BertTokenizer, BertModel
-from app.data_processing.text_to_audio import TextAudioDataset
-import soundfile as sf
 from torch.utils.data import DataLoader
-from transformers import BertTokenizer, BertModel
-
+from app.data_processing.text_to_audio import TextAudioDataset
 from app.utils.helper import create_text_to_audio_map
 
 # Load Tokenizer & Encoder
@@ -16,7 +12,7 @@ text_encoder = BertModel.from_pretrained('bert-base-uncased')
 
 class DiffWaveGenerator(nn.Module):
     def __init__(self, input_dim=768, audio_dim=22050):
-        super(DiffWave, self).__init__()
+        super(DiffWaveGenerator, self).__init__()
         self.input_dim = input_dim
         self.audio_dim = audio_dim
         
@@ -59,8 +55,7 @@ class DiffWave():
         self.model_path = "public/final_audio_generator.pth"
         self.model = DiffWaveGenerator()
 
-
-    def generate_audio(self, model, text, max_audio_len=22050):
+    def generate_audio(self, text, max_audio_len=22050):
         self.model.load_state_dict(torch.load(self.model_path))
         self.model.eval()
         
@@ -74,7 +69,7 @@ class DiffWave():
         
         # Generate audio
         with torch.no_grad():
-            generated_audio = model(text_embedding, noise)
+            generated_audio = self.model(text_embedding, noise)
         
         return generated_audio.squeeze().numpy()
     
@@ -84,23 +79,21 @@ class DiffWave():
 
         dataset = TextAudioDataset(text_to_audio_map, audio_dir)
         dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
-        self.train_model(self.model, dataloader)
+        self.train_model(dataloader)
     
-    def train_model(self, model, dataloader, epochs=50, lr=0.0005, grad_accum_steps=4):
+    def train_model(self, dataloader, epochs=50, lr=0.0005, grad_accum_steps=4):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model.to(device)
-        optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=1e-5)
+        self.model.to(device)
+        optimizer = optim.AdamW(self.model.parameters(), lr=lr, weight_decay=1e-5)
         criterion = nn.MSELoss()
         
-        model.train()
+        self.model.train()
 
         for epoch in range(epochs):
             total_loss = 0
-            print(len(dataloader))
             for text_embedding, audio in dataloader:
                 optimizer.zero_grad()
-                output = model(text_embedding, audio)
-                print(output.shape, output.mean(), output.std())
+                output = self.model(text_embedding, audio)
                 loss = criterion(output, audio)
                 loss.backward()
                 optimizer.step()
