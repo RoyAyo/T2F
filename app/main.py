@@ -9,7 +9,6 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
-from starlette.middleware.sessions import SessionMiddleware
 
 from app.model.fart_model import FartModel
 
