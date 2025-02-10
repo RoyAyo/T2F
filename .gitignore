@@ -4,6 +4,7 @@ venv/
 .venv/
 env/
 fart*/
+fart_t.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
