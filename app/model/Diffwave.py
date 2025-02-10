@@ -6,10 +6,6 @@ from torch.utils.data import DataLoader
 from app.data_processing.text_to_audio import TextAudioDataset
 from app.utils.helper import create_text_to_audio_map
 
-# Load Tokenizer & Encoder
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-text_encoder = BertModel.from_pretrained('bert-base-uncased')
-
 class DiffWaveGenerator(nn.Module):
     def __init__(self, input_dim=768, audio_dim=22050):
         super(DiffWaveGenerator, self).__init__()
@@ -54,15 +50,17 @@ class DiffWave():
         # Load Model
         self.model_path = "public/final_audio_generator.pth"
         self.model = DiffWaveGenerator()
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.text_encoder = BertModel.from_pretrained('bert-base-uncased')
 
     def generate_audio(self, text, max_audio_len=22050):
         self.model.load_state_dict(torch.load(self.model_path))
         self.model.eval()
         
         # Encode text
-        inputs = tokenizer(text, return_tensors='pt', padding='max_length', max_length=50, truncation=True)
+        inputs = self.tokenizer(text, return_tensors='pt', padding='max_length', max_length=50, truncation=True)
         with torch.no_grad():
-            text_embedding = text_encoder(**inputs).last_hidden_state.mean(dim=1)
+            text_embedding = self.text_encoder(**inputs).last_hidden_state.mean(dim=1)
         
         # Generate random noise as initial audio
         noise = torch.zeros(1, max_audio_len)

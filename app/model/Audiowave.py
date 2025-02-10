@@ -6,9 +6,6 @@ from transformers import BertTokenizer, BertModel
 from app.data_processing.text_to_audio import TextAudioDataset
 from torch.utils.data import DataLoader
 
-# Load Tokenizer & Encoder
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-text_encoder = BertModel.from_pretrained('bert-base-uncased')
 
 class SimpleAudioGenerator(nn.Module):
     def __init__(self, text_dim=768, hidden_dim=512, audio_len=22050):
@@ -37,14 +34,16 @@ class AudioWave:
     def __init__(self):
         self.model_path = "fart_models/final_audiowave_model.pth"
         self.model = SimpleAudioGenerator()
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.text_encoder = BertModel.from_pretrained('bert-base-uncased')
         
     def generate_audio(self, text, output_file="new.wav", sr=22050, max_audio_len=22050):
         self.model.load_state_dict(torch.load(self.model_path))
         self.model.eval()
 
-        inputs = tokenizer(text, return_tensors='pt', padding='max_length', max_length=50, truncation=True)
+        inputs = self.tokenizer(text, return_tensors='pt', padding='max_length', max_length=50, truncation=True)
         with torch.no_grad():
-            text_embedding = text_encoder(**inputs).last_hidden_state.mean(dim=1)  # [1, 768]
+            text_embedding = self.text_encoder(**inputs).last_hidden_state.mean(dim=1)  # [1, 768]
         
         with torch.no_grad():
             generated_audio = self.model(text_embedding).squeeze(0).numpy()

@@ -1,12 +1,13 @@
+import io
 from app.model.ai import AI
-from phonemizer.separator import Separator
+from app.utils.helper import convert_string_text_to_array
 import numpy as np
 import librosa
 import soundfile as sf
 
 ai = AI()
 
-class Concatenate:
+class ConcatenateFarts:
     def combine_audios(self, audios):
         if len(audios) == 0:
             return None, None
@@ -14,8 +15,9 @@ class Concatenate:
         combined_audio = np.array([])
         sr = 44100
 
-        for audio in audios:
-            if audio == "":
+        for audio_path in audios:
+            audio = audio_path.strip()
+            if audio == "silence":
                 silence = np.zeros(int(sr * 0.3))
                 if combined_audio.size == 0:
                     combined_audio = silence
@@ -39,11 +41,18 @@ class Concatenate:
                 combined_audio = np.concatenate([combined_audio, y])
 
         return combined_audio, sr
+    
+    def create_fart_buffer(self, audio, sr):
+        buffer = io.BytesIO()
+        sf.write(buffer, audio, sr, format="WAV")
+        buffer.seek(0)
+        return buffer
 
     def generate_audio(self, text):
-        farts = ai.get_fart_audios_to_user(text)
-        print("farts")
+        farts_text = ai.get_fart_audios_to_user(text)
+        farts = convert_string_text_to_array(farts_text)
         audios, sr = self.combine_audios(farts)
-
-        sf.write(f"{"".join(audios)}.wav", audios, sr)
-        return audios, sr
+        print(audios)
+        buffer = self.create_fart_buffer(audios, sr)
+        print(buffer, "buffer")
+        return buffer
