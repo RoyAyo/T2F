@@ -9,7 +9,6 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from starlette.middleware.trustedhost import TrustedHostMiddleware
-from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 from app.model.fart_model import FartModel
 
@@ -32,7 +31,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Add middlewares
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://text2fart.com", "http://localhost"],
+    allow_origins=["https://text2fart.com"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
@@ -43,7 +42,6 @@ app.add_middleware(
     TrustedHostMiddleware, 
     allowed_hosts=["text2fart.com", "api.text2fart.com", "localhost"]
 )
-app.add_middleware(HTTPSRedirectMiddleware)
 
 @app.get("/", status_code=200)
 @limiter.limit("10/minute")
