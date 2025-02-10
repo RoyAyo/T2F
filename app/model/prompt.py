@@ -44,7 +44,6 @@ fart_0.1long_0.2pitch_rapid_burst
 fart_0.4long_0.8pitch_low_burst
 fart_0.5long_0.3pitch_sudden_muffled
 fart_0.1long_0.5pitch_rapid_pop
-fart_0.4long_0.5pitch_short_deep
 fart_0.6long_0.2pitch_abrupt_pop
 fart_0.7long_0.6pitch_long_tapering
 fart_0.2long_0.7pitch_rapid_burst
