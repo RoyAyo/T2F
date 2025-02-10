@@ -1,6 +1,7 @@
 import os
 from pydantic import BaseModel
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
@@ -8,14 +9,6 @@ from app.model.fart_model import FartModel
 
 class FartBodyRequest(BaseModel):
     text: str
-
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     instrumentator.expose(app)
-    
-#     connect_to_mongo()
-#     yield
-#     close_mongo_connection()
 
 fartModel = FartModel()
 
@@ -43,7 +36,10 @@ def get_fart(body: FartBodyRequest):
         })
     except Exception as e:
         print(e)
-        return {"error": "Unable to generate audio"}
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Error Processing", "error": True},
+        )
 
 if __name__ == "__main__":
     import uvicorn
