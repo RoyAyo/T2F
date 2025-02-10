@@ -5,7 +5,8 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import StreamingResponse
-from slowapi import Limiter
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
@@ -15,43 +16,52 @@ from app.model.fart_model import FartModel
 class FartBodyRequest(BaseModel):
     text: str
 
+# Initialize the FartModel
 fartModel = FartModel()
 
+# Create FastAPI app
 app = FastAPI()
 
-limiter = Limiter(key_func=get_remote_address, default_limits=["10/minute"])
+# Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 
+# Add rate limit exceeded handler
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+# Add middlewares
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://text2fart.com"],
+    allow_origins=["https://text2fart.com", "http://localhost"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
-app.add_middleware(GZipMiddleware, minimum_size=1000) 
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=["text2fart.com", "api.text2fart.com" , "localhost"])
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=["text2fart.com", "api.text2fart.com", "localhost"]
+)
 app.add_middleware(HTTPSRedirectMiddleware)
 
-@app.middleware("http")
-async def rate_limit_middleware(request: Request, call_next):
-    response = await limiter(request, call_next)
-    return response
-
 @app.get("/", status_code=200)
-def read_root():
+@limiter.limit("10/minute")
+async def read_root(request: Request):
     return {"message": "Health Check!!!"}
 
 @app.post("/fart", status_code=200)
-def get_fart(body: FartBodyRequest):
+@limiter.limit("10/minute")
+async def get_fart(request: Request, body: FartBodyRequest):
     try:
         audio_buffer = fartModel.generate_audio(body.text)
-        print("audio", audio_buffer)
-        return StreamingResponse(audio_buffer, media_type="audio/wav", headers={
-            "Content-Disposition": "attachment; filename=fart.wav"
-        })
+        return StreamingResponse(
+            audio_buffer, 
+            media_type="audio/wav", 
+            headers={
+                "Content-Disposition": "attachment; filename=fart.wav"
+            }
+        )
     except Exception as e:
         print(e)
         return JSONResponse(
