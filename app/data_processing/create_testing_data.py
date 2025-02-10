@@ -1,4 +1,4 @@
-from pydub import AudioSegment
+# from pydub import AudioSegment
 import threading
 from threading import Semaphore
 
@@ -9,7 +9,8 @@ def process_phoneme(phoneme, semaphore = ""):
         for p in phoneme.strip().split("."):
             if p == "":
                 continue
-            sound = AudioSegment.from_wav(f"fart/fart_{p}.wav")
+            # sound = AudioSegment.from_wav(f"fart/fart_{p}.wav")
+            sound = ""
             sounds.append(sound)
         combined = sum(sounds)
         combined.export(f"fart_test/{phoneme}.wav", format="wav")
