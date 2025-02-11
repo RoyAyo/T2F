@@ -66,6 +66,25 @@ async def get_fart(request: Request, body: FartBodyRequest):
             status_code=400,
             content={"message": "Error Processing", "error": True},
         )
+    
+@app.post("/tweet2fart", status_code=200)
+@limiter.limit("10/minute")
+async def get_fart(request: Request, body: FartBodyRequest):
+    try:
+        audio_buffer = fartModel.generate_audio_from_tweet(body.text)
+        return StreamingResponse(
+            audio_buffer, 
+            media_type="audio/wav", 
+            headers={
+                "Content-Disposition": "attachment; filename=fart.wav"
+            }
+        )
+    except Exception as e:
+        print(e)
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Error Processing", "error": True},
+        )
 
 if __name__ == "__main__":
     import uvicorn

@@ -25,3 +25,22 @@ class AI:
             print("AI Response: ", answer)
             return answer
         return None
+    
+    def get_fitting_meme(self, text):
+        response = openAiClient.chat.completions.create(
+            model="gpt-4o-mini",
+            temperature=0.1,
+            top_p=0.0,
+            messages=[
+                {"role": "system", "content": text_2_fart_prompt
+                },
+                {"role": "user", "content": text}
+            ],
+        )
+
+        if response.choices:
+            message = dict(response.choices[0].message)
+            answer = message.get("content")
+            print("AI Response: ", answer)
+            return answer
+        return None
