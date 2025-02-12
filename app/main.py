@@ -40,7 +40,7 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     TrustedHostMiddleware, 
-    allowed_hosts=["fartifytweet.fun", "api.fartifytweet.fun", "localhost:5173"]
+    allowed_hosts=["fartifytweet.fun", "api.fartifytweet.fun", "localhost"]
 )
 
 @app.get("/", status_code=200)
