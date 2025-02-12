@@ -65,9 +65,9 @@ class ConcatenateFarts:
 
     def generate_sentiment_audio(self, tweet):
         print(tweet, "tweet")
-        cached_tweet = redisClient.get(tweet)
-        if cached_tweet:
-            return io.BytesIO(cached_tweet)
+        # cached_tweet = redisClient.get(tweet)
+        # if cached_tweet:
+        #     return io.BytesIO(cached_tweet)
 
         text = get_tweet_text(tweet)
         if not text:
@@ -78,5 +78,5 @@ class ConcatenateFarts:
         print("expressions", farts)
         audios, sr = self.combine_audios(farts)
         buffer = self.create_fart_buffer(audios, sr)
-        redisClient.set(tweet, buffer.getvalue())
+        # redisClient.set(tweet, buffer.getvalue())
         return buffer
