@@ -31,7 +31,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Add middlewares
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["fartifytweet.fun", "api.fartifytweet.fun"],
+    allow_origins=["https://fartifytweet.fun", "https://api.fartifytweet.fun"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,7 +40,7 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     TrustedHostMiddleware, 
-    allowed_hosts=["fartifytweet.fun", "api.fartifytweet.fun", "localhost"]
+    allowed_hosts=["https://fartifytweet.fun", "https://api.fartifytweet.fun", "localhost"]
 )
 
 @app.get("/", status_code=200)
