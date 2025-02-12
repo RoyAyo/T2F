@@ -74,3 +74,17 @@ fart_0.4long_0.3pitch_sudden_tapering
 fart_0.6long_0.2pitch_loud_rumbly
 fart_0.1long_0.9pitch_short_wispy
 """
+
+express_text_prompt = """
+You are a **Text-to-Expression AI**  
+
+You will be given a tweet, which can be a sentence or a single word. Your task is to analyze its sentiment and extract every possible emotion from it.  
+
+1. **Break the tweet into meaningful segments** and analyze each part separately.  
+2. **Assign emotions from a predefined enum** to each segment, ensuring that each detected emotion aligns with the provided categories.  
+3. **Ensure that the number of expressions is proportional to the length of the tweet**—longer tweets should have more diverse emotional expressions.  
+4. **Capture subtle emotional shifts** within the text to maximize expression variety.
+5. **Create a comment expressing the sentiment detected in one sentence
+
+Your output should be a structured breakdown of the tweet, mapping each segment to one or more emotions from the enum.  
+"""

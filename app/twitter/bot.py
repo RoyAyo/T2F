@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-tweet_url = "https://nitter.net/roy_ay0/status/1889417355341520920"
+from app.utils.helper import convert_twitter_url_to_nitter
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36",
@@ -17,10 +17,12 @@ session = requests.Session()
 
 def get_tweet_text(tweet_url):
     try:
-        response = session.get(tweet_url, headers=headers)
+        nitter_url = convert_twitter_url_to_nitter(tweet_url)
+        response = session.get(nitter_url, headers=headers)
         soup = BeautifulSoup(response.text, "html.parser")
         tweet_text = soup.find("div", class_="tweet-content").text
+        print("Tweet Text: ", tweet_text)
         return tweet_text
     except Exception as e:
-        print(e)
+        print("Error occured:", e)
         return None

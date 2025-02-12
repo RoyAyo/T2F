@@ -13,3 +13,6 @@ def convert_string_text_to_array(text):
     text = text.replace("[", "").replace("]", "").replace('"', "").replace("`", "")
     array_text = text.split(",")
     return array_text
+
+def convert_twitter_url_to_nitter(tweet_url):
+    return tweet_url.replace("https://twitter.com", "https://nitter.net").replace("https://x.com", "https://nitter.net")
